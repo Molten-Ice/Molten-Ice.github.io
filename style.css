@@ -1,21 +1,26 @@
- p {
-    color: green;
-  }
-  
-  h1 {
-    color: maroon;
-  }
-  
-  .title {
-    color: turquoise;
-  }
-  
-  .uppercase {
+.uppercase {
     text-transform: uppercase;
   }
   
-  #article-title {
+#article-title {
     font-family: cursive;
   }
+
+h2 {
+  font-size: 8;
+}
   
-  
+/* Remove purple color for visited links */
+a:visited {
+  color: inherit;
+}
+
+/* Remove purple color for active (clicked) links */
+a:active {
+  color: inherit;
+}
+
+/* Optional: Remove the underline for all links */
+a {
+  text-decoration: none;
+}
