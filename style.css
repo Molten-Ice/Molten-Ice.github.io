@@ -1,26 +1,24 @@
-.uppercase {
-    text-transform: uppercase;
-  }
-  
 #article-title {
     font-family: cursive;
   }
 
-h2 {
-  font-size: 8;
-}
-  
-/* Remove purple color for visited links */
-a:visited {
-  color: inherit;
-}
-
-/* Remove purple color for active (clicked) links */
-a:active {
-  color: inherit;
-}
-
-/* Optional: Remove the underline for all links */
+/* Set the color for normal links */
 a {
-  text-decoration: none;
+  color: #000000;
+  text-decoration: none; /* Optional: if you want to remove the underline */
+}
+
+/* Set the color for visited links */
+a:visited {
+  color: #000000;
+}
+
+/* Set the color for links when hovered over */
+a:hover {
+  color: #000000;
+}
+
+/* Set the color for active (clicked) links */
+a:active {
+  color: #000000;
 }
