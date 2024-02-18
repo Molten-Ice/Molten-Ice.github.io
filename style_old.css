@@ -1,0 +1,24 @@
+#article-title {
+    font-family: cursive;
+  }
+
+/* Set the color for normal links */
+a {
+  color: #000000;
+  text-decoration: none; /* Optional: if you want to remove the underline */
+}
+
+/* Set the color for visited links */
+a:visited {
+  color: #000000;
+}
+
+/* Set the color for links when hovered over */
+a:hover {
+  color: #000000;
+}
+
+/* Set the color for active (clicked) links */
+a:active {
+  color: #000000;
+}

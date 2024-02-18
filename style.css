@@ -1,7 +1,60 @@
-#article-title {
-    font-family: cursive;
+body {
+    margin: 5vw; /* 5% of the viewport width */
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+/* Flexbox formatting */
+  .container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* Center the items if they don't take up the full width */
+  }
+  
+  .flex-item {
+    display: flex;
+    align-items: center;
+    width: 100%; 
+    margin: 3vw 0; /* 5% of the viewport width */
+  }
+  
+  .flex-item img {
+    width: 55%;
+    height: auto;
+    display: block;
+  }
+  
+  .flex-item .story-desc {
+    width: 45%; 
+    margin: 0px 10px;
   }
 
+
+/* Font formatting for paragraphs */
+
+.story-date {
+    color: #333;
+    margin-top: 0px;
+    margin-bottom: 0px;
+
+}
+.story-title {
+    font-size: 24px; /* Adjust the size as needed */
+    font-family: cursive;
+    font-weight: bold; /* Makes the title bold */
+    margin-top: 0px;
+    margin-bottom: 0px;
+    color: #333; /* Dark grey color for the text */
+  }
+
+.story-preview {
+    margin-top: 3px;
+    margin-top: 0px;
+    color: #333;
+    
+}
+
+  /* Setting up hyperlinks to not modify the colour */
 /* Set the color for normal links */
 a {
   color: #000000;
