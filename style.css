@@ -19,16 +19,19 @@ body {
   }
   
   .flex-item img {
-    width: 55%;
+    width: 50%;
     height: auto;
     display: block;
   }
   
   .flex-item .story-desc {
-    width: 45%; 
+    width: 50%; 
     margin: 0px 10px;
   }
 
+.story-desc {
+    font-size: clamp(9px, 2vw, 20px);
+}
 
 /* Font formatting for paragraphs */
 
