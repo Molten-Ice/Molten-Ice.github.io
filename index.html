@@ -4,15 +4,112 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>James' Website :)</title>
-  <link href='style.css' rel='stylesheet'>
+  <style>
+    /* Reset and base styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 5vw;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+      background-color: #fafafa;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: center;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .flex-item {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      padding: 1.5rem;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .flex-item:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .flex-item img {
+      width: 40%;
+      height: auto;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .story-desc {
+      width: 60%;
+      padding-left: 1.5rem;
+      font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+    }
+
+    .story-date {
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .story-title {
+      font-size: clamp(1.2rem, 2vw, 1.8rem);
+      font-family: 'Georgia', serif;
+      font-weight: bold;
+      color: #2c3e50;
+      margin-bottom: 0.75rem;
+    }
+
+    .story-preview {
+      display: -webkit-box;
+      display: box;
+      -webkit-line-clamp: 4;
+      line-clamp: 4;
+      -webkit-box-orient: vertical;
+      box-orient: vertical;
+      overflow: hidden;
+      color: #4a4a4a;
+      text-overflow: ellipsis;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .flex-item {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .flex-item img {
+        width: 100%;
+        margin-bottom: 1rem;
+      }
+
+      .story-desc {
+        width: 100%;
+        padding-left: 0;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="container">
 
-    <a href='./writings/AHopelessRomantic.md' class="flex-item">
+    <a href='./writings/html/AHopelessRomantic.html' class="flex-item">
       <img src='./writings/images/AHopelessRomantic.png'/>
       <div class='story-desc'>
-        <p class='story-date'>01/01/2024</p>
         <p class='story-title'>A Hopeless Romantic</p>
         <p class='story-preview'>
           I forever resided in a state of dreaming paralysis; consuming my mind daily with eternal infatuation. Yet I wonder if it heightens my bliss, my future euphoria. Or simply diminishes my reality, rendering the future to prove insufficient. You associate yourself with insecurity, connotate with suffering. Is this your revenge? A trade for all you bring. Love. A word feeling insufficient, 4 letters to represent a lifetime of emotions...
@@ -20,40 +117,36 @@
       </div>
     </a>
 
-      <!-- FORMAT WE WANT -->
-      <a href='./writings/ChildrenOfTheGods.md' class="flex-item">
-        <img src='./writings/images/ChildrenOfTheGods.png'/>
-        <div class='story-desc'>
-          <p class='story-date'>19/02/2023</p>
-          <p class='story-title'>Children of the Gods</p>
-          <p class='story-preview'>
-            A sweet sound began to resonate through the halls.
-            It was gentle, therapeutic like it could solve life’s most complicated faults in a single intonation. Yet it stood with prowess, its demeanour unmoving as it refused to be cast aside. It sought infiltration; demanded corrupt of any within its reach. Slowly it seduced Zion’s mind, until he was all consumed by it...
-          </p>
-        </div>
-      </a>
+    <a href='./writings/html/ChildrenOfTheGods.html' class="flex-item">
+      <img src='./writings/images/ChildrenOfTheGods.png'/>
+      <div class='story-desc'>
+        <p class='story-title'>Children of the Gods</p>
+        <p class='story-preview'>
+          A sweet sound began to resonate through the halls.
+          It was gentle, therapeutic like it could solve life’s most complicated faults in a single intonation. Yet it stood with prowess, its demeanour unmoving as it refused to be cast aside. It sought infiltration; demanded corrupt of any within its reach. Slowly it seduced Zion’s mind, until he was all consumed by it...
+        </p>
+      </div>
+    </a>
 
-      <a href='./writings/TheTalismanOfTime.md' class="flex-item">
-        <img src='./writings/images/TheTalismanOfTime.jpg'/>
-        <div class='story-desc'>
-          <p class='story-date'>14/05/2022</p>
-          <p class='story-title'>The Talisman Of Time</p>
-          <p class='story-preview'>
-            “They had been designed to embody the ultimate form of art, a medium through which the gods could comprehend themselves. The god's goal had been to create mechanical beings so complicated they began to evolve, so intricate they could comprehend their own existence, a new lifeform that could only be known as biological. Now humanity stood stuck in their predetermined reality without a way to escape, an imprisonment if viewed with pessimism. They eventually would come to this same conclusion themselves, for their very construction was too artistic, too perfect, to be any accidental construction." - excerpt from The Book Of Chronos...
-          </p>
-        </div>
-      </a>
+    <a href='./writings/html/TheTalismanOfTime.html' class="flex-item">
+      <img src='./writings/images/TheTalismanOfTime.png'/>
+      <div class='story-desc'>
+        <p class='story-title'>The Talisman Of Time</p>
+        <p class='story-preview'>
+          “They had been designed to embody the ultimate form of art, a medium through which the gods could comprehend themselves. The god's goal had been to create mechanical beings so complicated they began to evolve, so intricate they could comprehend their own existence, a new lifeform that could only be known as biological. Now humanity stood stuck in their predetermined reality without a way to escape, an imprisonment if viewed with pessimism. They eventually would come to this same conclusion themselves, for their very construction was too artistic, too perfect, to be any accidental construction." - excerpt from The Book Of Chronos...
+        </p>
+      </div>
+    </a>
 
-      <a href='./writings/AnUnexpectedDay/AnUnexpectedDay.md' class="flex-item">
-        <img src='./writings/images/AnUnexpectedDay.png'/>
-        <div class='story-desc'>
-          <p class='story-date'>01/01/2024</p>
-          <p class='story-title'>An Unexpected Day</p>
-          <p class='story-preview'>
-            The journey began, knowing I needed to occupy my mind, which was often predisposed to overthinking, I began a new book - The Currents of Space. A book whose protagonist suffered from amnesia, an entirely suitable coincidence for this day, since no better word could be chosen to reflect my feelings on love. It had been years since I last put myself out there, a choice necessarily deliberate, nonetheless a choice shrouded with conflict...
-          </p>
-        </div>
-      </a>
+    <a href='./writings/html/AnUnexpectedDay.html' class="flex-item">
+      <img src='./writings/images/AnUnexpectedDay.png'/>
+      <div class='story-desc'>
+        <p class='story-title'>An Unexpected Day</p>
+        <p class='story-preview'>
+          The journey began, knowing I needed to occupy my mind, which was often predisposed to overthinking, I began a new book - The Currents of Space. A book whose protagonist suffered from amnesia, an entirely suitable coincidence for this day, since no better word could be chosen to reflect my feelings on love. It had been years since I last put myself out there, a choice necessarily deliberate, nonetheless a choice shrouded with conflict...
+        </p>
+      </div>
+    </a>
   </div>
 </body>
 </html>
