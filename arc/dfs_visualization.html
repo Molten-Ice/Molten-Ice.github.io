@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>DFS Tree Visualization - Dasher-style Next Tokens</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body { 
+            font-family: sans-serif;
+            margin: 20px;
+        }
+
+        #tree-container {
+            width: 100%;
+            height: 800px;
+            border: 1px solid #ccc;
+            overflow: auto;
+        }
+
+        .link {
+            fill: none;
+            stroke: #ccc;
+            stroke-width: 1.5px;
+        }
+
+        .node circle {
+            fill: #fff;
+            stroke: steelblue;
+            stroke-width: 1.5px;
+            cursor: pointer;
+        }
+
+        .node text {
+            font-size: 12px;
+        }
+
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 20px;
+        }
+
+        .grid-cell {
+            width: 20px;
+            height: 20px;
+            border: 1px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+            margin: 20px;
+        }
+
+        #keypad-container {
+            height: 140px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .token-section {
+            min-width: 40px;
+            height: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .current-token {
+            width: 60px;
+            height: 60px;
+            border: 2px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .token-button {
+            width: 40px;
+            height: 40px;
+            margin: 2px;
+            border: 1px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .token-grid {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .token-grid > div {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            justify-content: flex-start;
+        }
+
+        #current-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+
+        #visualization-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        #grid-container {
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+
+        #left-panel {
+            flex: 0 0 400px;  /* Fixed width for left panel */
+        }
+
+        #right-panel {
+            flex: 1;          /* Take remaining space */
+        }
+
+        .tooltip {
+            position: absolute;
+            display: grid;
+            background-color: rgba(255, 255, 255, 0.95);
+            color: black;
+            border: 1px solid #333;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            pointer-events: none;
+            padding: 10px;
+            max-width: 300px;
+            white-space: pre-wrap;
+            opacity: 0;
+        }
+
+        .tab-container {
+            margin-bottom: 20px;
+        }
+        
+        .tab-button {
+            padding: 10px 20px;
+            border: none;
+            background: #f0f0f0;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        
+        .tab-button.active {
+            background: #007bff;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+
+        .mapping-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .mapping-pair {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .mapping-cell {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .mapping-arrow {
+            font-size: 20px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 22px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(18px);
+        }
+
+        .slider.round {
+            border-radius: 34px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+
+        #view-label {
+            margin-left: 10px;
+            font-size: 16px;
+        }
+
+        /* Add styles for the permutation controls */
+        .permutation-controls {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .permutation-button {
+            margin: 5px;
+            padding: 8px 15px;
+            border: none;
+            background: #f0f0f0;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .permutation-button:hover {
+            background: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <div class="tab-container">
+        <label class="switch">
+            <input type="checkbox" id="view-toggle">
+            <span class="slider round"></span>
+        </label>
+        <span id="view-label">DFS Tree View</span>
+    </div>
+    
+    <div id="problem-tab" class="tab-content active">
+        <div class="container">
+            <div id="train-container">
+                <h3>Training Examples</h3>
+                <div id="train-grids"></div>
+            </div>
+            <div id="test-container">
+                <h3>Test Example</h3>
+                <div id="test-grids"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="dfs-tab" class="tab-content">
+        <div id="loading">Loading DFS tree data...</div>
+        <div class="container">
+            <!-- Left side - Tile selector -->
+            <div id="left-panel">
+                <div id="visualization-container">
+                    <div id="keypad-container">
+                        <div class="token-section" id="previous-token"></div>
+                        <div class="current-token" id="current-token"></div>
+                        <div class="token-section" id="token-pad"></div>
+                    </div>
+                    <div id="grid-container">
+                        <h3>Current Grid <span id="current-score"></span></h3>
+                        <div id="current-grid"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right side - Tree visualization -->
+            <div id="right-panel">
+                <div id="tree-container"></div>
+                <div class="tooltip"></div>
+            </div>
+        </div>
+    </div>
+
+<script>
+// Map tokens (digits, newline, etc.) to colors
+const colorMap = {
+    '0': '#FFFFFF', // white
+    '1': '#0074D9', // blue
+    '2': '#FF4136', // red
+    '3': '#2ECC40', // green
+    '4': '#FFDC00', // yellow
+    '5': '#AAAAAA', // gray
+    '6': '#F012BE', // magenta
+    '7': '#FF851B', // orange
+    '8': '#7FDBFF', // light blue
+    '9': '#870C25', // dark red
+    '\n': '#800080'  // purple for newline
+};
+
+/**
+ * Reconstruct the full characters_so_far by traversing
+ * up the parent chain to the root, collecting last_token
+ */
+function buildCharactersSoFar(node) {
+    const tokens = [];
+    let current = node;
+    while (current) {
+        if (current.data?.last_token) {
+            tokens.push(current.data.last_token);
+        }
+        current = current.parent;
+    }
+    // The root will have an empty last_token, so reverse to get the correct order
+    tokens.reverse();
+    return tokens.join('');
+}
+
+// Helper function to convert a string into grid HTML
+function createGridHTML(characters) {
+    if (!characters) return '<div>No grid data available</div>';
+    
+    let rows = characters.split('\n');
+    let gridHTML = '';
+    
+    for (let row of rows) {
+        let rowHTML = '';
+        for (let i = 0; i < row.length; i++) {
+            const char = row[i];
+            const backgroundColor = colorMap[char] || '#FFFFFF';
+            rowHTML += `<div class="grid-cell" style="background-color: ${backgroundColor};"></div>`;
+        }
+        if (rowHTML) {
+            gridHTML += `<div style="display: flex;">${rowHTML}</div>`;
+        }
+    }
+    
+    return gridHTML;
+}
+
+// Update the #current-grid panel given a set of characters
+function updateGridDisplay(characters) {
+    const gridContainer = document.getElementById('current-grid');
+    const fragment = document.createDocumentFragment();
+    const rows = characters.split('\n');
+    
+    rows.forEach(row => {
+        if (row.length) {
+            const rowDiv = document.createElement('div');
+            rowDiv.style.display = 'flex';
+            
+            for (let i = 0; i < row.length; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'grid-cell';
+                cell.style.backgroundColor = colorMap[row[i]] || '#FFFFFF';
+                rowDiv.appendChild(cell);
+            }
+            fragment.appendChild(rowDiv);
+        }
+    });
+    
+    gridContainer.innerHTML = '';
+    gridContainer.appendChild(fragment);
+}
+
+/**
+ * Update the top keypad area:
+ * - "Previous token" button
+ * - "Current token" display
+ * - "Next tokens" (children) grid
+ */
+function updateTokenPad(currentNode) {
+    // 1. Build the full string of tokens for the current node
+    const fullString = buildCharactersSoFar(currentNode);
+    // Current token is the last character in that string (or empty)
+    const currentToken = fullString.slice(-1) || '';
+    
+    // Update the big black square for the current token - Use mapped token for color
+    const currentTokenDiv = document.getElementById('current-token');
+    currentTokenDiv.style.backgroundColor = colorMap[currentToken] || '#FFFFFF';
+    currentTokenDiv.textContent = currentToken === '\n' ? '⏎' : currentToken;
+
+    // 2. Previous token section (with back button)
+    const previousTokenDiv = document.getElementById('previous-token');
+    previousTokenDiv.innerHTML = '';
+    
+    if (currentNode.parent) {
+        // If not the root, display a back button
+        const backButton = document.createElement('div');
+        backButton.className = 'token-button';
+        backButton.style.backgroundColor = '#DDDDDD';
+        backButton.textContent = '←';
+
+        let isHovering = false;
+        let currentHoverNode = null;
+
+        backButton.onclick = () => {
+            if (currentNode.parent) {
+                navigateToNode(currentNode.parent);
+            }
+        };
+
+        backButton.onmouseenter = () => {
+            isHovering = true;
+            currentHoverNode = currentNode;
+            
+            // Only check once, don't recursively navigate
+            if (currentHoverNode?.parent && currentHoverNode.parent.children.length < 2) {
+                navigateToNode(currentHoverNode.parent);
+            }
+        };
+
+        backButton.onmouseleave = () => {
+            isHovering = false;
+            currentHoverNode = null;
+        };
+
+        previousTokenDiv.appendChild(backButton);
+    }
+
+    // 3. Next tokens (token-pad)
+    const tokenPad = document.getElementById('token-pad');
+    tokenPad.innerHTML = '';
+    
+    // If there's no children, show a placeholder
+    if (!currentNode?.children) {
+        tokenPad.innerHTML = '<div></div>';
+        return;
+    }
+
+    // Gather the set of next tokens from children
+    const tokens = [...new Set(currentNode.children.map(child => child.data.last_token))];
+    
+    const fragment = document.createDocumentFragment();
+    const gridDiv = document.createElement('div');
+    gridDiv.className = 'token-grid';
+
+    tokens.forEach(token => {
+        const buttonDiv = document.createElement('div');
+        buttonDiv.className = 'token-button';
+        console.log('Token:', token, 'Color:', colorMap[token]);
+        buttonDiv.style.backgroundColor = colorMap[token] || '#FFFFFF';
+        buttonDiv.style.color = 'black';
+        
+        // Find the child node with this token to get its score
+        const childNode = currentNode.children.find(child => child.data.last_token === token);
+        const score = childNode ? childNode.data.score : '?';
+        
+        // Create a container for the button and score
+        const container = document.createElement('div');
+        container.style.display = 'flex';
+        container.style.alignItems = 'center';
+        container.style.gap = '5px';
+        
+        // Add token to button
+        buttonDiv.textContent = token === '\n' ? '⏎' : token;
+        buttonDiv.dataset.singleChoice = currentNode.children.length === 1;
+        buttonDiv.dataset.token = (token === '\n') ? '\\n' : token;
+        
+        // Add score text
+        const scoreText = document.createElement('span');
+        scoreText.textContent = `(score: ${score})`;
+        scoreText.style.fontSize = '12px';
+        
+        container.appendChild(buttonDiv);
+        container.appendChild(scoreText);
+        gridDiv.appendChild(container);
+    });
+    
+    fragment.appendChild(gridDiv);
+    tokenPad.appendChild(fragment);
+}
+
+// Helper to highlight the current node in the tree
+function updateVisualization(currentNode) {
+    // Remove any existing highlights
+    d3.selectAll(".node circle")
+        .style("fill", "#fff")
+        .style("stroke", "steelblue");
+    
+    // Highlight the current node
+    d3.selectAll(".node")
+        .filter(d => d.data.global_number === currentNode.data.global_number)
+        .select("circle")
+        .style("fill", "#ffeb3b")
+        .style("stroke", "#f57f17");
+}
+
+// Global reference to the current node
+let currentNode;
+
+/**
+ * Navigate to a specific node (e.g. on click or back-button),
+ * then update everything accordingly.
+ */
+function navigateToNode(targetNode) {
+    if (!targetNode) return;
+    currentNode = targetNode;
+
+    // Recompute and update the entire string for grid
+    const fullString = buildCharactersSoFar(currentNode);
+    updateGridDisplay(fullString);
+    
+    // Update score display
+    const scoreSpan = document.getElementById('current-score');
+    scoreSpan.textContent = `(Score: ${targetNode.data.score}), depth: ${targetNode.data.depth}`;
+    
+    // Update token pad
+    updateTokenPad(currentNode);
+
+    // Highlight on the tree
+    updateVisualization(currentNode);
+}
+
+/**
+ * Load the new JSON (with only last_token) and build the D3 tree.
+ */
+async function loadAndVisualize() {
+    try {
+        // Fetch the new data
+        const response = await fetch('assets/dfs_tree_tiny.json');
+        let treeData = await response.json();
+        
+        document.getElementById('loading').style.display = 'none';
+        
+        // Build a root node for D3's hierarchy
+        currentNode = d3.hierarchy(treeData);
+        
+        // Use buildCharactersSoFar to reconstruct the root's string
+        const rootString = buildCharactersSoFar(currentNode);
+        updateGridDisplay(rootString);
+        
+        // Initialize the token pad
+        updateTokenPad(currentNode);
+
+        // Set up the tree layout
+        const margin = {top: 20, right: 90, bottom: 30, left: 90};
+        const width = 800 - margin.left - margin.right;
+        const height = 800 - margin.top - margin.bottom;
+
+        const svg = d3.select("#tree-container")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", `translate(${margin.left},${margin.top})`);
+
+        const tree = d3.tree().size([height, width]);
+        const root = currentNode;
+        tree(root);
+
+        // Create links (paths + optional labels)
+        const link = svg.selectAll(".link")
+            .data(root.links())
+            .enter()
+            .append("g");
+
+        link.append("path")
+            .attr("class", "link")
+            .attr("d", d3.linkHorizontal()
+                .x(d => d.y)
+                .y(d => d.x));
+
+        // Optionally add small labels on the link if the parent has multiple children
+        link.append("text")
+            .attr("dy", -5)
+            .attr("text-anchor", "middle")
+            .attr("transform", d => {
+                if (!d.source.children || d.source.children.length < 2) return null;
+                const midX = (d.source.y + d.target.y) / 2;
+                const midY = (d.source.x + d.target.x) / 2;
+                return `translate(${midX},${midY})`;
+            })
+            .text(d => {
+                // Only show label if parent has multiple children
+                if (!d.source.children || d.source.children.length < 2) return "";
+                // The token that led to d.target
+                return d.target.data.last_token === '\n' ? '⏎' : d.target.data.last_token;
+            });
+
+        // Create nodes
+        const node = svg.selectAll(".node")
+            .data(root.descendants())
+            .enter().append("g")
+            .attr("class", "node")
+            .attr("transform", d => `translate(${d.y},${d.x})`)
+            .filter(d => {
+                // Show node if it's:
+                // 1. root, or
+                // 2. has >= 2 children, or
+                // 3. is a leaf, or
+                // 4. is a child of a node with >= 2 children
+                return !d.parent || 
+                       (d.children?.length >= 2) || 
+                       (!d.children) ||
+                       (d.parent?.children.length >= 2);
+            });
+
+        // Draw circles
+        node.append("circle")
+            .attr("r", 5);
+
+        // Add labels
+        node.append("text")
+            .attr("dy", ".35em")
+            .attr("x", d => d.children ? -13 : 13)
+            .attr("text-anchor", d => d.children ? "end" : "start")
+            .text(d => {
+                let label = d.data.global_number;
+                return label;
+            });
+
+        // Tooltip
+        const tooltip = d3.select(".tooltip");
+
+        // Mouse events
+        node.on("mouseover", function(event, d) {
+            const tooltipCharacters = buildCharactersSoFar(d);
+            const tooltipContent = `
+                <div style="margin-bottom: 10px;">
+                    <strong>Score:</strong> ${d.data.score}
+                    <strong>Depth:</strong> ${d.data.depth}
+                </div>
+                ${createGridHTML(tooltipCharacters)}
+            `;
+            tooltip.style("opacity", 1)
+                   .html(tooltipContent)
+                   .style("left", (event.pageX + 10) + "px")
+                   .style("top", (event.pageY - 10) + "px");
+        })
+        .on("mouseout", () => tooltip.style("opacity", 0))
+        .on("click", (event, d) => {
+            event.stopPropagation();
+            navigateToNode(d);
+        });
+
+    } catch (error) {
+        console.error("Error loading the DFS tree data:", error);
+        document.getElementById('loading').textContent =
+            'Error loading DFS tree data: ' + error.message;
+    }
+}
+
+// Start everything
+loadAndVisualize();
+
+/**
+ * On selecting a token in the UI, find the matching child and go there.
+ */
+function selectToken(token) {
+    // Handle escaped newline
+    const actualToken = token === '\\n' ? '\n' : token;
+
+    // Find the correct child
+    const nextNode = currentNode.children?.find(child => child.data.last_token === actualToken);
+    if (nextNode) {
+        navigateToNode(nextNode);
+    }
+}
+
+/**
+ * On "go back"
+ */
+function goBack() {
+    if (currentNode && currentNode.parent) {
+        navigateToNode(currentNode.parent);
+    }
+}
+
+// Hover-click logic on the token-pad
+let hoverTimeout;
+document.getElementById('token-pad').addEventListener('mouseover', (event) => {
+    const button = event.target.closest('.token-button');
+    if (!button) return;
+    
+    if (button.dataset.singleChoice === 'true') {
+        hoverTimeout = setTimeout(() => {
+            if (button.dataset.isBack) {
+                goBack();
+            } else {
+                selectToken(button.dataset.token);
+            }
+        }, 30);
+    }
+});
+
+document.getElementById('token-pad').addEventListener('mouseout', () => {
+    clearTimeout(hoverTimeout);
+});
+
+document.getElementById('token-pad').addEventListener('click', (event) => {
+    const button = event.target.closest('.token-button');
+    if (!button) return;
+    
+    if (button.dataset.isBack) {
+        goBack();
+    } else {
+        selectToken(button.dataset.token);
+    }
+});
+
+// Tab switching logic
+document.querySelectorAll('.tab-button').forEach(button => {
+    button.addEventListener('click', () => {
+        // Update button states
+        document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+        button.classList.add('active');
+        
+        // Update content visibility
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        document.getElementById(`${button.dataset.tab}-tab`).classList.add('active');
+    });
+});
+
+// Load and display the problem grids
+async function loadAndDisplayProblem() {
+    try {
+        const response = await fetch('assets/challenge_00dbd492.json');
+        const data = await response.json();
+        
+        // Display training examples
+        const trainContainer = document.getElementById('train-grids');
+        data.train.forEach((example, index) => {
+            const wrapper = document.createElement('div');
+            wrapper.style.marginBottom = '20px';
+            wrapper.innerHTML = `
+                <h4>Training Example ${index + 1}</h4>
+                <div style="display: flex; gap: 20px;">
+                    <div>
+                        <h5>Input:</h5>
+                        ${createGridHTML(example.input.map(row => row.join('')).join('\n'))}
+                    </div>
+                    <div>
+                        <h5>Output:</h5>
+                        ${createGridHTML(example.output.map(row => row.join('')).join('\n'))}
+                    </div>
+                </div>
+            `;
+            trainContainer.appendChild(wrapper);
+        });
+        
+        // Display test example
+        const testContainer = document.getElementById('test-grids');
+        const testExample = data.test[0];
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = `
+            <div style="display: flex; gap: 20px;">
+                <div>
+                    <h5>Input:</h5>
+                    ${createGridHTML(testExample.input.map(row => row.join('')).join('\n'))}
+                </div>
+                <div>
+                    <h5>Output:</h5>
+                    ${createGridHTML(testExample.output.map(row => row.join('')).join('\n'))}
+                </div>
+            </div>
+        `;
+        testContainer.appendChild(wrapper);
+        
+    } catch (error) {
+        console.error("Error loading the problem data:", error);
+    }
+}
+
+// Call both initialization functions
+loadAndDisplayProblem();
+
+// Update the tab switching logic to use the toggle
+document.getElementById('view-toggle').addEventListener('change', function(e) {
+    const label = document.getElementById('view-label');
+    const dfsTab = document.getElementById('dfs-tab');
+    const problemTab = document.getElementById('problem-tab');
+    
+    if (this.checked) {
+        label.textContent = 'Problem View';
+        dfsTab.classList.remove('active');
+        problemTab.classList.add('active');
+    } else {
+        label.textContent = 'DFS Tree View';
+        problemTab.classList.remove('active');
+        dfsTab.classList.add('active');
+    }
+});
+
+// Set initial state to DFS view
+document.getElementById('view-toggle').checked = false;
+document.getElementById('dfs-tab').classList.add('active');
+document.getElementById('problem-tab').classList.remove('active');
+
+// Grid transformation functions
+function rotateGrid(degrees) {
+    const grid = document.querySelector('#test-grids .grid');
+    if (!grid) return;
+    
+    // Store the current transformation
+    const currentTransform = grid.style.transform || '';
+    grid.style.transform = `${currentTransform} rotate(${degrees}deg)`;
+}
+
+function flipGrid(direction) {
+    const grid = document.querySelector('#test-grids .grid');
+    if (!grid) return;
+    
+    // Store the current transformation
+    const currentTransform = grid.style.transform || '';
+    const flipValue = direction === 'horizontal' ? 'scaleX(-1)' : 'scaleY(-1)';
+    grid.style.transform = `${currentTransform} ${flipValue}`;
+}
+</script>
+</body>
+</html>
+

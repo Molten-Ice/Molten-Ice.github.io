@@ -102,10 +102,10 @@ HTML_TEMPLATE = """
 </head>
 <body>
     <div class="home-header">
-        <a href="../../index.html" class="home-link">Home</a>
+        <a href="../index.html" class="home-link">Home</a>
     </div>
     <div class="story-container">
-        <img src="../../writings/images/{image_name}.png" alt="{title}">
+        <img src="../images/{image_name}.png" alt="{title}">
         {content}
     </div>
 </body>
@@ -151,11 +151,11 @@ def create_table_of_contents(md_content):
     return toc_html, modified_content
 
 def convert_md_to_html():
-    output_dir = Path("writings/html")
+    output_dir = Path("html")
     output_dir.mkdir(exist_ok=True)
     
-    writings_dir = Path("writings")
-    md_files = list(writings_dir.glob("**/*.md"))
+    writings_dir = Path(".")
+    md_files = list(writings_dir.glob("*.md"))
     
     for md_file in md_files:
         with open(md_file, 'r', encoding='utf-8') as f:
