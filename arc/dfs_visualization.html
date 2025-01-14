@@ -280,9 +280,52 @@
         .permutation-button:hover {
             background: #e0e0e0;
         }
+
+        .description {
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .description a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .description a:hover {
+            text-decoration: underline;
+        }
+
+        .selector-tooltip, .tree-tooltip {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            border-left: 4px solid #007bff;
+            color: #666;
+        }
+
+        /* Add new card styles */
+        .card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin: 20px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .card p {
+            margin: 0;
+        }
     </style>
 </head>
 <body>
+    <div class="card">
+        <div class="description">
+            <p>This is a visualization of a finetuned LLaMA LLM model solving an <a href="https://arcprize.org/">ARC-AGI</a> problem. Utilizing the code from <a href="https://github.com/da-fr/arc-prize-2024/tree/main">the arc prize 2024 winners</a>, where the LLM is used in conjunction with a Depth-first search tree to explore possibilities ordinary sampling would miss. A lower score means the LLM is more certain, if adding the next possible token would make the score go over ~2.2 then that route is no longer valid. Notice how the tree branches at point where the LLM has to make a colour decision.</p>
+        </div>
+    </div>
+
     <div class="tab-container">
         <label class="switch">
             <input type="checkbox" id="view-toggle">
@@ -309,6 +352,9 @@
         <div class="container">
             <!-- Left side - Tile selector -->
             <div id="left-panel">
+                <div class="selector-tooltip">
+                    Hover over boxes to preview tokens, click to add them to the grid. Single-choice tokens will be automatically selected on hover.
+                </div>
                 <div id="visualization-container">
                     <div id="keypad-container">
                         <div class="token-section" id="previous-token"></div>
@@ -324,6 +370,9 @@
             
             <!-- Right side - Tree visualization -->
             <div id="right-panel">
+                <div class="tree-tooltip">
+                    Hover over any node to preview its grid state. Click a node to jump to that point in the sequence.
+                </div>
                 <div id="tree-container"></div>
                 <div class="tooltip"></div>
             </div>
